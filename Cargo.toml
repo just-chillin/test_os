@@ -16,3 +16,6 @@ panic = "abort" # disable stack unwinding on panic
 
 [dependencies]
 bootloader = "0.9.11"
+
+[dev-dependencies]
+bootimage = "0.10.1"
