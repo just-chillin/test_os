@@ -13,6 +13,7 @@ pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
 #[repr(u8)]
 pub enum InterruptIndex {
     Timer = PIC_1_OFFSET,
+    Keyboard
 }
 
 impl InterruptIndex {
@@ -37,6 +38,7 @@ lazy_static! {
         idt.breakpoint.set_handler_fn(fault_handler);
         idt.double_fault.set_handler_fn(double_fault_handler);
         idt[InterruptIndex::Timer.as_usize()].set_handler_fn(timer_interrupt_handler);
+        idt[InterruptIndex::Keyboard.as_usize()].set_handler_fn(keyboard_interrupt_handler);
         idt
     };
 }
@@ -63,11 +65,19 @@ extern "x86-interrupt" fn double_fault_handler(
 }
 
 extern "x86-interrupt" fn timer_interrupt_handler(stack: &mut InterruptStackFrame) {
-    static mut N: u8 = 0;
+    static mut N: u16 = 0;
     unsafe {
         if N % 2 == 0 {print!("beep")}
         else {print!("boop")}
         N += 1;
+        PICS.lock()
+            .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
+    }
+}
+
+extern "x86-interrupt" fn keyboard_interrupt_handler(stack: &mut InterruptStackFrame) {
+    println!("Keyboard interrupt!");
+    unsafe {
         PICS.lock()
             .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
     }

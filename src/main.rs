@@ -11,6 +11,8 @@ use core::panic::PanicInfo;
 mod vga;
 mod interrupts;
 mod memes;
+mod proc;
+mod game;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
@@ -18,17 +20,10 @@ fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
-
-
-fn main() {
-    println!("Started!!");
-}
-
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
     interrupts::idt_init();
     interrupts::pic_init();
-
-    main();
+    println!("OS Started!");
     loop {}
 }

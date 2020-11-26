@@ -25,3 +25,6 @@ x86_64 = "0.12.3"
 
 [dev-dependencies]
 bootimage = "0.10.1"
+
+[package.metadata.bootimage]
+run-command = ["qemu-system-x86_64", "-drive", "format=raw,file={}"]
