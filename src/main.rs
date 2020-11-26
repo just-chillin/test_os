@@ -11,7 +11,6 @@ use core::panic::PanicInfo;
 mod vga;
 mod interrupts;
 mod memes;
-mod proc;
 mod game;
 
 #[panic_handler]
