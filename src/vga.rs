@@ -62,4 +62,8 @@ impl VGAWriter {
             self.write_char(' ');
         }
     }
+
+    pub fn reset(&mut self) {
+        self.n = 0;
+    }
 }

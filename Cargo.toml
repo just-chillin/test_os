@@ -21,6 +21,7 @@ rand = {version = "0.7.3", default-features = false}
 lazy_static = {version = "1.4.0", features = ["spin_no_std"]}
 spin = "0.7.0"
 pic8259_simple = "0.2.0"
+x86_64 = "0.12.3"
 
 [dev-dependencies]
 bootimage = "0.10.1"

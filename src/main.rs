@@ -1,5 +1,6 @@
 #![no_std]
 #![no_main]
+#![feature(abi_x86_interrupt)]
 
 // Links a version of libc re-written in rust, so that we can allocate memory.
 extern crate rlibc;
@@ -8,9 +9,8 @@ use core::panic::PanicInfo;
 
 #[macro_use]
 mod vga;
-mod lapic;
-mod x86;
-mod interrupt;
+mod interrupts;
+mod memes;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
@@ -18,12 +18,17 @@ fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
+
+
+fn main() {
+    println!("Started!!");
+}
+
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    println!("yooooo rust is awesome");
-    println!("println works too!");
-    x86::cpuid();
-    // lapic::init();
-    // write!(vga, "yooooo rust is awesome").unwrap();
+    interrupts::idt_init();
+    interrupts::pic_init();
+
+    main();
     loop {}
 }
