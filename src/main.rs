@@ -1,37 +1,29 @@
 #![no_std]
 #![no_main]
-#![feature(fmt_as_str)]
-#![feature(core_intrinsics)]
 
 // Links a version of libc re-written in rust, so that we can allocate memory.
 extern crate rlibc;
 
 use core::panic::PanicInfo;
-use core::fmt::Write;
-use core::arch::x86_64::{_rdrand32_step};
 
+#[macro_use]
 mod vga;
+mod lapic;
+mod x86;
+mod interrupt;
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
+    println!("{}", _info);
     loop {}
 }
 
-fn random() -> u32 {
-    let mut result: u32 = 0;
-    unsafe {
-        _rdrand32_step(&mut result);
-    }
-    return result;
-}
-
-
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    let mut vga = vga::VGAWriter::new();
-    write!(vga, "yooooo rust is awesome").unwrap();
-
-
-    write!(vga, "{}", random()).unwrap();
+    println!("yooooo rust is awesome");
+    println!("println works too!");
+    x86::cpuid();
+    // lapic::init();
+    // write!(vga, "yooooo rust is awesome").unwrap();
     loop {}
 }

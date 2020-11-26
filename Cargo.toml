@@ -18,6 +18,9 @@ panic = "abort" # disable stack unwinding on panic
 bootloader = "0.9.11"
 rlibc = "1.0.0"
 rand = {version = "0.7.3", default-features = false}
+lazy_static = {version = "1.4.0", features = ["spin_no_std"]}
+spin = "0.7.0"
+pic8259_simple = "0.2.0"
 
 [dev-dependencies]
 bootimage = "0.10.1"

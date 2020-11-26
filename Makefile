@@ -7,7 +7,7 @@ run: build
 	cargo run
 
 dbg: build
-	cargo run -- -gdb tcp::3333 -S
+	cargo run -- -s -S
 
 clean:
 	cargo clean
