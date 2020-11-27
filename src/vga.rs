@@ -43,8 +43,8 @@ impl fmt::Write for VGAWriter {
             self.newline();
             return Ok(());
         }
-        let color = (0xb as u16) << 8;
-        vga_buffer[self.row][self.col] = c as u16 | color;
+        const COLOR: u16 = (0xb as u16) << 8;
+        vga_buffer[self.row][self.col] = c as u16 | COLOR;
         if self.col >= 80 {
             self.newline();
         } else {
