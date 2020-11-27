@@ -2,14 +2,13 @@ use core::fmt::{self, Write};
 use lazy_static::lazy_static;
 use spin;
 
-const VGA_BUFFER_ADDR: *mut u8 = 0xb8000 as *mut u8;
-
 pub struct VGAWriter {
-    n: usize,
+    row: usize,
+    col: usize,
 }
 
 lazy_static! {
-    pub static ref STDOUT: spin::Mutex<VGAWriter> = spin::Mutex::new(VGAWriter::new());
+    static ref STDOUT: spin::Mutex<VGAWriter> = spin::Mutex::new(VGAWriter::new());
 }
 
 #[macro_export]
@@ -33,37 +32,36 @@ impl fmt::Write for VGAWriter {
         for ch in s.chars() {
             self.write_char(ch).unwrap();
         }
-        return Ok(())
+        return Ok(());
     }
 
     fn write_char(&mut self, c: char) -> fmt::Result {
+        let vga_buffer = unsafe {
+            (0xb8000 as *mut [[u16; 80]; 35]).as_mut().unwrap()
+        };
         if c == '\n' {
             self.newline();
-            return Ok(())
+            return Ok(());
         }
-        unsafe {
-            *VGA_BUFFER_ADDR.add(self.n * 2) = c as u8;
-            *VGA_BUFFER_ADDR.add(self.n * 2 + 1) = 0xb;
+        let color = (0xb as u16) << 8;
+        vga_buffer[self.row][self.col] = c as u16 | color;
+        if self.col >= 80 {
+            self.newline();
+        } else {
+            self.col += 1;
         }
-        self.n += 1;
-        return Ok(())
+        return Ok(());
     }
 }
 
 impl VGAWriter {
     pub fn new() -> VGAWriter {
-        return VGAWriter { n: 0 };
+        return VGAWriter { row: 0, col: 0 };
     }
 
     pub fn newline(&mut self) {
-        let col = self.n % 80;
-        let padding = 80 - col;
-        for _ in 0..padding {
-            self.write_char(' ');
-        }
-    }
-
-    pub fn reset(&mut self) {
-        self.n = 0;
+        self.col = 0;
+        self.row += 1;
+        self.row = self.row.clamp(0, 80);
     }
 }

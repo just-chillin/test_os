@@ -1,10 +1,7 @@
 use lazy_static::lazy_static;
 use pic8259_simple::ChainedPics;
+use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 use crate::memes;
-use x86_64::structures::{
-    idt::{InterruptDescriptorTable, InterruptStackFrame},
-    gdt,
-};
 
 pub const PIC_1_OFFSET: u8 = 32;
 pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
@@ -54,24 +51,26 @@ pub fn pic_init() {
 }
 
 // Handlers
-extern "x86-interrupt" fn fault_handler(stack: &mut InterruptStackFrame) {
+extern "x86-interrupt"
+fn fault_handler(stack: &mut InterruptStackFrame) {
     println!("AAAAAA SOMETHING BROKEEEEE\n{:#?}", stack);
 }
 
-extern "x86-interrupt" fn double_fault_handler(
-    stack: &mut InterruptStackFrame, code: u64) -> !
-{
+extern "x86-interrupt"
+fn double_fault_handler(stack: &mut InterruptStackFrame, code: u64) -> ! {
     panic!("Error: {} {:#?}\n {}", code, stack, memes::HEADING_OUT);
 }
 
-extern "x86-interrupt" fn timer_interrupt_handler(stack: &mut InterruptStackFrame) {
+extern "x86-interrupt"
+fn timer_interrupt_handler(_: &mut InterruptStackFrame) {
     unsafe {
         PICS.lock()
             .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
     }
 }
 
-extern "x86-interrupt" fn keyboard_interrupt_handler(stack: &mut InterruptStackFrame) {
+extern "x86-interrupt"
+fn keyboard_interrupt_handler(_: &mut InterruptStackFrame) {
     println!("Keyboard interrupt!");
     unsafe {
         PICS.lock()
