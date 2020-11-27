@@ -6,6 +6,7 @@
 extern crate rlibc;
 
 use core::panic::PanicInfo;
+use bootloader::{BootInfo, entry_point};
 
 #[macro_use]
 mod vga;
@@ -19,8 +20,8 @@ fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
+entry_point!(main);
+fn main(_: &'static BootInfo) -> ! {
     interrupts::idt_init();
     interrupts::pic_init();
     println!("OS Started!");

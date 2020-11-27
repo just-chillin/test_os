@@ -15,7 +15,7 @@ panic = "abort" # disable stack unwinding on panic
 panic = "abort" # disable stack unwinding on panic
 
 [dependencies]
-bootloader = "0.9.11"
+bootloader = {version="0.9.11"}
 rlibc = "1.0.0"
 rand = {version = "0.7.3", default-features = false}
 lazy_static = {version = "1.4.0", features = ["spin_no_std"]}

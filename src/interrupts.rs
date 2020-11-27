@@ -65,11 +65,7 @@ extern "x86-interrupt" fn double_fault_handler(
 }
 
 extern "x86-interrupt" fn timer_interrupt_handler(stack: &mut InterruptStackFrame) {
-    static mut N: u16 = 0;
     unsafe {
-        if N % 2 == 0 {print!("beep")}
-        else {print!("boop")}
-        N += 1;
         PICS.lock()
             .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
     }
