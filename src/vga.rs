@@ -7,7 +7,11 @@ pub struct VGAWriter {
     col: usize,
 }
 
-
+#[repr(C)]
+struct VGACharacter {
+    character: u8,
+    color: u8,
+}
 
 lazy_static! {
     static ref STDOUT: spin::Mutex<VGAWriter> = spin::Mutex::new(VGAWriter::new());
@@ -39,14 +43,13 @@ impl fmt::Write for VGAWriter {
 
     fn write_char(&mut self, c: char) -> fmt::Result {
         let vga_buffer = unsafe {
-            (0xb8000 as *mut [[u16; 80]; 35]).as_mut().unwrap()
+            (0xb8000 as *mut [[VGACharacter; 80]; 35]).as_mut().unwrap()
         };
         if c == '\n' {
             self.newline();
             return Ok(());
         }
-        const DEFAULT_COLOR: u16 = (0xb as u16) << 8;
-        vga_buffer[self.row][self.col] = c as u16 | DEFAULT_COLOR;
+        vga_buffer[self.row][self.col] = VGACharacter { color: 0xb, character: c as u8 };
         if self.col >= 80 {
             self.newline();
         } else {
